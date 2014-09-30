@@ -1,4 +1,4 @@
-var n = 5;
+var n = 25;
 //Tower of hanoi recusive function
 function hanoi(n){
    //BASIS CASES:
