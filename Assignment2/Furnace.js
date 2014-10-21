@@ -1,34 +1,19 @@
 var http = require('http');
 var url = require('url');
-
+var io = require('socket.io');
 var options = {
 	hostname: 'localhost',
 	port:'3000',
 	path:'/furnace?start=on'
 }
 
+var socket = io.connect();
 
-setInterval(function(){
-   }, 1000);
+socket.on('message',function(data){
+	console.log(data.message);
+});
 
-function handleResponse(response){
-  var serverData = '';
-  response.on('data', function(chunk){
-    serverData = ""+chunk; 
-  	if(serverData == "turnOn") response.write("on");
-	else response.write("off");
-  } );
-  
-  response.on('end', function(){
-     console.log('Response Status: ', response.statusCode);
-     console.log('Response Headers: ',response.headers);
-     console.log(serverData);
-     });
-}
 
-http.request(options, function(response){
-   handleResponse(response);
-   }).end();
 var Furnace = function() { 
 }
 var isOn;

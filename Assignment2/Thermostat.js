@@ -3,6 +3,7 @@ var util = require("util");
 var http = require("http");
 var url = require("url");
 var qstring = require('querystring');
+var io= require('socket.io');
 
 
 var EventEmitter = require('events').EventEmitter;
@@ -44,33 +45,16 @@ Class.prototype.setThermostat = function(temp){
 
 setInterval(function(){console.log("Temp: " + roomTemp++)},1000);
 
- var urlObj; 
-  http.createServer(function (request,response){
-     urlObj = url.parse(request.url, true, false);
-		setInterval(function(){
-			console.log("Temp: " + roomTemp++)
-			if (temp(roomTemp) == 1)
-				response.write("turnOn");
-			else
-				response.write("turnOff");
-		
-		},1000);
+var server = http.createServer(function (request,response){
+	response.write("connected");
+	response.end();
 
- }).listen(3000);
- function handleResponse(response){
-  var serverData ='';
-  response.on('data',function(chunk){
-  serverData=""+chunk;
-  console.log(serverData);
-  
-  });
-  response.on('end', function(){
-     console.log('Response Status: ', response.statusCode);
-     console.log('Response Headers: ',response.headers);
-     console.log(serverData);
-     });
-}
+ })
+ server.listen(3000);
+ var io = listen(server);
  
- 
+ io.sockets.on('connection',function(socket){
+	socket.emit('message',{'message' : 'Hello world'});
+ });
    
 module.exports = Class; 
