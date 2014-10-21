@@ -17,35 +17,20 @@ var counter = 1000; //to count invocations of function(req,res)
 
 var ROOT_DIR = 'html'; //dir for static files
 
-http.createServer(function (request,response){
-     var urlObj = url.parse(request.url, true, false);
-     console.log("PATHNAME: " + urlObj.pathname);
-     console.log("REQUEST: " + ROOT_DIR + urlObj.pathname);
-/*
-     fs.readFile(ROOT_DIR + urlObj.pathname, function(err,data){
-       if(err){
-          console.log('ERROR: ' + JSON.stringify(err));
-          response.writeHead(404);
-          response.end(JSON.stringify(err));
-          return;
-         }
-         response.writeHead(200, {'Content-Type': 'text/html'});
-         response.end(data);
-       });
-*/
- }).listen(3000);
+
 setTimeout( function again(){
-   if(furn.isON()) therm.setRoomTemp(therm.getRoomTemp() + 1);
-	else therm.setRoomTemp(therm.getRoomTemp() -1);
 	
-	if(therm.temp(therm.getRoomTemp() )== 1){
+   //if(furn.isON()) therm.setRoomTemp(therm.getRoomTemp() + 1);
+	//else therm.setRoomTemp(therm.getRoomTemp() -1);
+	
+	/*if(therm.temp(therm.getRoomTemp() )== 1){
 		serv.emit("run");
 	}else if(therm.temp(therm.getRoomTemp()) == -1){
 		serv.emit("stop");
 	}
-
+	*/
    console.log('TEMP: ' + therm.getRoomTemp());
-
+	
    setTimeout(again, 1000); //recursively restart timeout
 
    }, 1000);
