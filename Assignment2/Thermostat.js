@@ -2,10 +2,10 @@
 var util = require("util");
 var http = require("http");
 var url = require("url");
-var qstring = require('querystring');
-var io= require('socket.io');
+var net= require('net');
 
-
+var HOST = '127.0.0.1';
+var PORT = 3000;
 var EventEmitter = require('events').EventEmitter;
 var desiredTemperature = 20; //desired room temperature
 var hysteresis = 2.5; //thermostat hysteresis
@@ -15,6 +15,20 @@ var isOn;
 var Class = function() { }
 util.inherits(Class, EventEmitter);
 
+var sock;
+net.createServer(function(socket){
+	sock = socket;
+	console.log('Connected: ' + sock.remoteAddress+ ':' + sock.remotePort);
+	sock.on('data',function(data){
+		console.log(""+data);
+		if(data == 'off') isOn=false;
+		else if(data =='on') isOn=true;
+	});
+	sock.on('close',function(data){
+		console.log("closed");
+	});
+}).listen(PORT,HOST);
+	
 var options = {
 	hostname: 'localhost',
 	port:'3000',
@@ -23,13 +37,18 @@ var options = {
 
 function temp (t) { //Posts information to localHost
   if(t < desiredTemperature - hysteresis ) {
-	  return 1;
+	  sock.write('turnOn');
+	  
   }
   else if(t > desiredTemperature + hysteresis) { 
-	  return -1;
+	  sock.write('turnOff');
+	 
   }
   
 }
+Class.prototype.setThermostat = function(temp){
+   desiredTemperature = temp;
+};
 
 Class.prototype.getRoomTemp = function(){
 	return roomTemp;
@@ -38,23 +57,14 @@ Class.prototype.setRoomTemp = function(t){
 	roomTemp = t;
 };
 
-Class.prototype.setThermostat = function(temp){
-   desiredTemperature = temp;
-};
+ setInterval(function(){
+	if(isOn==true) roomTemp++;
+	else roomTemp--;
+	console.log("Temp: " + roomTemp);
+	temp(roomTemp);
+	getWeather();
+},1000);
 
 
-setInterval(function(){console.log("Temp: " + roomTemp++)},1000);
-
-var server = http.createServer(function (request,response){
-	response.write("connected");
-	response.end();
-
- })
- server.listen(3000);
- var io = listen(server);
- 
- io.sockets.on('connection',function(socket){
-	socket.emit('message',{'message' : 'Hello world'});
- });
    
 module.exports = Class; 

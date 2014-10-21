@@ -1,29 +1,30 @@
 var http = require('http');
 var url = require('url');
-var io = require('socket.io');
-var options = {
-	hostname: 'localhost',
-	port:'3000',
-	path:'/furnace?start=on'
-}
+var net = require('net');
 
-var socket = io.connect();
 
-socket.on('message',function(data){
-	console.log(data.message);
+var HOST = '127.0.0.1';
+var PORT = 3000;
+
+
+var client = new net.Socket();
+client.connect(PORT,HOST,function(){
+	console.log("Connected");
 });
 
+client.on('data',function(data){
+	if(data == 'turnOn') client.write('on');
+	else if(data=='turnOff') client.write('off');
 
+});	
+
+client.on('close',function(){
+	console.log('closed');
+});
 var Furnace = function() { 
 }
-var isOn;
-function turnOn() {
-	isOn= true;
-	console.log("Here");
-};
-function turnOff() {
-	isOn= false;
-};
+
+
 Furnace.prototype.isON =function(){ return isOn;};
 
 
